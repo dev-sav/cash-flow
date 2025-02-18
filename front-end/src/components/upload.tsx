@@ -1,32 +1,30 @@
 "use client";
+import React from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { store } from "../../store";
+import {
+  createTransaction,
+  getTransactions,
+  reset,
+} from "../../store/transactionsSlice";
 
 const Upload = () => {
   const { handleSubmit, register } = useForm();
-  const handleUpload = async (data) => {
-    console.log("mavuika");
-    console.log(JSON.stringify(data));
+  const dispatch = useDispatch<typeof store.dispatch>();
 
+  const handleUpload = async (data) => {
     const formData = new FormData();
     formData.append("pdfFile", data.pdfFile[0]);
 
-    console.log(formData.get("pdfFile"));
-
-    try {
-      await fetch("http://localhost:8081/extract-text", {
-        method: "post",
-        body: formData,
-      })
-        .then((response) => {
-          return response.text();
-        })
-        .then((extractedTxt) => {
-          console.log(extractedTxt);
-        });
-    } catch (e) {
-      console.error(e);
-    }
+    dispatch(createTransaction(formData)).then((response) => {
+      if (response.meta.requestStatus === "fulfilled") {
+        dispatch(getTransactions());
+        console.log(`shut`);
+      }
+    });
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit(handleUpload)}>

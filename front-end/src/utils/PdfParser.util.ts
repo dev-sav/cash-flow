@@ -1,4 +1,4 @@
-const trimFluffs = (arr) => {
+function trimFluffs(arr) {
   const anchor = ["BEGINNING", "BALANCE", "AMOUNT", "THIS"];
   let start;
   let end = arr.length; // only applicable on the last page
@@ -12,13 +12,13 @@ const trimFluffs = (arr) => {
   const cleanedPage = arr.slice(start, end);
 
   return cleanedPage;
-};
+}
 
-const getWords = (text) => {
+function getWords(text) {
   const words = text.split(" ");
   const trimEnd = words.slice(0, words.length - 1);
   return trimEnd;
-};
+}
 
 function chopItems(data) {
   const months = [
@@ -56,32 +56,21 @@ function chopItems(data) {
   return result;
 }
 
-const isRef = (str) => {
+function isRef(str) {
   const refRegex = /^\d{3,4}$/;
   return refRegex.test(str);
-};
+}
 
-const buildString = (obj, arr, startDesc, endDesc, stardDeets, endDeets) => {
+function buildString(obj, arr, startDesc, endDesc, stardDeets, endDeets) {
   const strDesc = arr.slice(startDesc, endDesc).join(" ");
   const strDeets = arr.slice(stardDeets, endDeets).join(" ");
   obj.description = strDesc;
   obj.details = strDeets;
 
   return obj;
-};
-/*
-[
-    "Partner",
-    "Merchant",
-    "Cash",
-    "In",
-    "0060",
-    "TO:",
-    "SHOPEEPAY",
-    "PHILI.....XXXXX43486"
-    ]
-    */
-const groupData = (obj, arr) => {
+}
+
+function groupData(obj, arr) {
   let newObj;
 
   const match = arr.find((word) => isRef(word));
@@ -97,30 +86,9 @@ const groupData = (obj, arr) => {
   }
 
   return newObj;
-};
+}
 
-/* 
-    [
-        [
-        "Oct",
-        "14",
-        "Partner",
-        "Merchant",
-        "Cash",
-        "In",
-        "0060",
-        "TO:",
-        "SHOPEEPAY",
-        "PHILI.....XXXXX43486",
-        "108.00",
-        "15,402.51"
-        ],
-        ....,
-        ....,
-     ] 
-*/
-
-const categorizeData = (arr) => {
+function categorizeData(arr) {
   const result = [];
 
   arr.forEach((item) => {
@@ -133,27 +101,10 @@ const categorizeData = (arr) => {
     result.push(newObj);
   });
 
-  /*
-    [
-        "Oct",
-        "14",
-        "Partner",
-        "Merchant",
-        "Cash",
-        "In",
-        "0060",
-        "TO:",
-        "SHOPEEPAY",
-        "PHILI.....XXXXX43486",
-        "108.00",
-        "15,402.51"
-        ],
-    */
-
   return result;
-};
+}
 
-const cleanPages = (text) => {
+function cleanPages(text) {
   // remove invalid pages
   const lines = text.split("\n");
   const sliced = lines.slice(6, lines.length - 2);
@@ -165,48 +116,19 @@ const cleanPages = (text) => {
     const words = getWords(value);
     const trimmed = trimFluffs(words);
     const chopped = chopItems(trimmed);
-    /* 
-    [
-        [
-        "Oct",
-        "14",
-        "Partner",
-        "Merchant",
-        "Cash",
-        "In",
-        "0060",
-        "TO:",
-        "SHOPEEPAY",
-        "PHILI.....XXXXX43486",
-        "108.00",
-        "15,402.51"
-        ],
-        ....,
-        ....,
-     ] 
-    */
+
     cleanedData = [...cleanedData, ...chopped];
   }
 
   const categorizedData = categorizeData(cleanedData);
 
   return categorizedData;
-};
+}
 
-const processPdfText = (text) => {
+function processPdfText(text) {
   const cleanedPages = cleanPages(text);
 
   return cleanedPages;
+}
 
-  /*  // Find the index of the line containing the searchString
-    const startIndex = lines.findIndex((line) => line.includes("Page3of4"));
-    const endIndex = lines.findIndex((line) => line.includes("Page4of4"));
-  
-    // If the searchString is not found or there aren't enough lines after it, return an empty array
-    if (startIndex === -1 || startIndex + 3 >= lines.length) {
-      return [];
-    }
-  
-    // Extract the specified number of lines after the found line
-    return lines.slice(startIndex + 4, endIndex - 2); */
-};
+export default processPdfText;

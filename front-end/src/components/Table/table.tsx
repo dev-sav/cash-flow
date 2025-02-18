@@ -1,3 +1,4 @@
+"use client";
 import styles from "./table.module.css";
 
 type Cell = { row?: number; column?: number; text?: string };
@@ -16,13 +17,14 @@ type Row = {
 };
 type Arg = {
   titles: string[];
-  data: Row[];
+  data: [];
+  loading: boolean;
+  error: any;
 };
 
 const Cell = ({ cell = {}, style = {} }: CellProps) => {
   const { text } = cell;
   const { container } = style;
-  console.log(text);
   return (
     <div className={`${styles.cell} ${container}`}>
       <p className={`${styles.minWidth0} ${container}`}>{text}</p>
@@ -31,17 +33,8 @@ const Cell = ({ cell = {}, style = {} }: CellProps) => {
 };
 
 const Row = ({ row }) => {
-  const {
-    id,
-    date,
-    transaction,
-    amount,
-    balance,
-    remarks,
-    checker,
-    inspection,
-  } = row;
-  console.log(transaction);
+  const { id, date, description, amount, balance, details, remarks } = row;
+
   return (
     <div className={styles.row}>
       <Cell
@@ -49,7 +42,7 @@ const Row = ({ row }) => {
         style={{ container: styles.width1 }}
       />
       <Cell
-        cell={{ row: id, column: 2, text: transaction }}
+        cell={{ row: id, column: 2, text: description }}
         style={{ container: styles.width3 }}
       />
       <Cell
@@ -61,15 +54,15 @@ const Row = ({ row }) => {
         style={{ container: styles.width2 }}
       />
       <Cell
-        cell={{ row: id, column: 5, text: remarks }}
+        cell={{ row: id, column: 5, text: details }}
         style={{ container: styles.width4 }}
       />
       <Cell
-        cell={{ row: id, column: 6, text: String(checker) }}
+        cell={{ row: id, column: 6, text: "" }}
         style={{ container: styles.width2 }}
       />
       <Cell
-        cell={{ row: id, column: 7, text: inspection }}
+        cell={{ row: id, column: 7, text: remarks }}
         style={{ container: styles.width3 }}
       />
     </div>
@@ -83,7 +76,8 @@ const calculateTitleWidth = (column: number) => {
   else return styles.width2;
 };
 
-const Table = ({ titles, data }: Arg) => {
+function Table({ titles, data, loading, error }: Arg) {
+  const safeData = Array.isArray(data) ? data : []; // Ensure it's always an array
   return (
     <div className={styles.table}>
       {/* TITLES */}
@@ -97,11 +91,15 @@ const Table = ({ titles, data }: Arg) => {
         ))}
       </div>
       {/* Data */}
-      {data.map((row) => (
-        <Row key={row.id} row={row} />
-      ))}
+      {loading ? <p>Loading...</p> : null}
+      {error ? <p>Error: {error}</p> : null}
+      {!loading && safeData.length < 1 ? (
+        <p>No data yet</p>
+      ) : (
+        safeData.map((row) => <Row key={row.id} row={row} />)
+      )}
     </div>
   );
-};
+}
 
 export default Table;
